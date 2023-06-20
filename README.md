@@ -29,7 +29,7 @@ You can start by cloning our repository and following the steps below.
     unzip models.zip
     ```
 
-3. [Optional] If you plan to train, populate `conf/wandb.yaml` with the information regarding your wandb account.
+3. [Optional] If you plan to train, populate `conf/wandb.yaml` with the information regarding your wandb account. use the yaml files in the `conf` folder to select the task, the models and their parameters.
 
 ## Code structure
 * `src` - Folder containing the implementation.
@@ -54,7 +54,7 @@ To learn how to reproduce results or train new models follow the tutorial in `re
 
 ## Credits
 
-Our codes are in part borrowed by the work
+* Our codes are in part borrowed by the work
 *What Can Transformers Learn In-Context? A Case Study of Simple Function Classes** <br>
 *Shivam Garg\*, Dimitris Tsipras\*, Percy Liang, Gregory Valiant* <br>
 Paper: http://arxiv.org/abs/2208.01066 <br><br>
@@ -68,3 +68,6 @@ Paper: http://arxiv.org/abs/2208.01066 <br><br>
       primaryClass={cs.CL}
 }
 ```
+
+* Thanks to the TML lab for the amazing supervision during the project.
+
