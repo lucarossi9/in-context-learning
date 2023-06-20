@@ -4,6 +4,7 @@
 ## Table of contents
 * [General info](#general-info)
 * [Setup](#setup)
+* [Code structure](#code structure)
 * [Credits](#credits)
 
 ## General info
