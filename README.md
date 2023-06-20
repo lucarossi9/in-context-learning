@@ -7,7 +7,7 @@
 * [Credits](#credits)
 
 ## General info
-This repository contains the code for the "in-context learning regression" project. It allows you to evaluate our trained models, reproduce our results and train new models.
+This repository contains the code for the "in-context learning regression" project. It allows you to evaluate our trained models, reproduce our results and train new models. As an example, you can replicate the plot investigating the closeness of the posterior mean-based estimator and Transformer.
 ![](OLS-random-mean.png)
 	
 ## Setup
@@ -40,7 +40,7 @@ are as follows (starting from `src`):
 
 ## Credits
 
-The repository is inspired by the codes of the paper
+Our codes are in part borrowed by the work
 *What Can Transformers Learn In-Context? A Case Study of Simple Function Classes** <br>
 *Shivam Garg\*, Dimitris Tsipras\*, Percy Liang, Gregory Valiant* <br>
 Paper: http://arxiv.org/abs/2208.01066 <br><br>
