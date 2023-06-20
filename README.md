@@ -1,19 +1,7 @@
-This repository contains the code and models for our paper:
+This repository contains the code for our report.
 
-**What Can Transformers Learn In-Context? A Case Study of Simple Function Classes** <br>
-*Shivam Garg\*, Dimitris Tsipras\*, Percy Liang, Gregory Valiant* <br>
-Paper: http://arxiv.org/abs/2208.01066 <br><br>
 
 ![](setting.jpg)
-
-```bibtex
-    @InProceedings{garg2022what,
-        title={What Can Transformers Learn In-Context? A Case Study of Simple Function Classes},
-        author={Shivam Garg and Dimitris Tsipras and Percy Liang and Gregory Valiant},
-        year={2022},
-        booktitle={arXiv preprint}
-    }
-```
 
 ## Getting started
 You can start by cloning our repository and following the steps below.
@@ -39,6 +27,15 @@ are as follows (starting from `src`):
 - The `eval.ipynb` notebook contains code to load our own pre-trained models, plot the pre-computed metrics, and evaluate them on new data.
 - `train.py` takes as argument a configuration yaml from `conf` and trains the corresponding model. You can try `python train.py --config conf/toy.yaml` for a quick training run.
 
-# Maintainers
-* [Shivam Garg](https://cs.stanford.edu/~shivamg/)
-* [Dimitris Tsipras](https://dtsipras.com/)
+# Credits
+*What Can Transformers Learn In-Context? A Case Study of Simple Function Classes** <br>
+*Shivam Garg\*, Dimitris Tsipras\*, Percy Liang, Gregory Valiant* <br>
+Paper: http://arxiv.org/abs/2208.01066 <br><br>
+```bibtex
+    @InProceedings{garg2022what,
+        title={What Can Transformers Learn In-Context? A Case Study of Simple Function Classes},
+        author={Shivam Garg and Dimitris Tsipras and Percy Liang and Gregory Valiant},
+        year={2022},
+        booktitle={arXiv preprint}
+    }
+```
