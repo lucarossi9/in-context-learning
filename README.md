@@ -8,7 +8,7 @@
 
 ## General info
 This repository contains the code for the "in-context learning regression" project. It allows you to evaluate our trained models, reproduce our results and train new models.
-![](OLS-random-mean.png)
+![](OLS-random-mean.png jpg =200x200)
 	
 ## Setup
 To run this project, install it locally using npm:
