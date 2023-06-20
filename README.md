@@ -1,4 +1,4 @@
-This repository contains the code for our report.
+This repository contains the code for the experiments of the "in-context learning regression" project.
 
 
 ![](setting.jpg)
@@ -28,7 +28,7 @@ are as follows (starting from `src`):
 - `train.py` takes as argument a configuration yaml from `conf` and trains the corresponding model. You can try `python train.py --config conf/toy.yaml` for a quick training run.
 
 
-## Credits
+### Credits
 
 The repository is inspired by the codes of the paper
 *What Can Transformers Learn In-Context? A Case Study of Simple Function Classes** <br>
