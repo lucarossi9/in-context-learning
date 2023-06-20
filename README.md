@@ -25,7 +25,7 @@ You can start by cloning our repository and following the steps below.
 2. Download [model checkpoints](https://github.com/dtsip/in-context-learning/releases/download/initial/models.zip) and extract them in the current directory.
 
     ```
-    wget https://github.com/dtsip/in-context-learning/releases/download/initial/models.zip
+    wget https://github.com/lucarossi9/in-context-learning/releases/download/initial/models.zip
     unzip models.zip
     ```
 
