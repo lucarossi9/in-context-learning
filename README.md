@@ -8,10 +8,9 @@
 
 ## General info
 This repository contains the code for the "in-context learning regression" project. It allows you to evaluate our trained models, reproduce our results and train new models.
-![](OLS-random-mean.png jpg =200x200)
+![](OLS-random-mean.png)
 	
 ## Setup
-To run this project, install it locally using npm:
 
 You can start by cloning our repository and following the steps below.
 
@@ -29,8 +28,9 @@ You can start by cloning our repository and following the steps below.
     unzip models.zip
     ```
 
-3. [Optional] If you plan to train, populate `conf/wandb.yaml` with you wandb info.
+3. [Optional] If you plan to train, populate `conf/wandb.yaml` with the information regarding your wandb account.
 
+## Code structure
 That's it! You can now explore our pre-trained models or train your own. The key entry points
 are as follows (starting from `src`):
 - The `eval.ipynb` notebook contains code to load our own pre-trained models, plot the pre-computed metrics, and evaluate them on new data.
