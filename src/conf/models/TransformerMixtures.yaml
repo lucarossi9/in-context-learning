@@ -1,0 +1,6 @@
+model:
+    family: transformer_mixtures
+    n_head: 4
+    n_embd: 28
+    num_blocks: 10
+    initializer_range: 0.02

@@ -1,0 +1,27 @@
+inherit: 
+    - base.yaml
+
+training:
+    task: noisy_laplace_linear_regression
+    curriculum:
+        points:
+            start: 11
+            end: 41
+            inc: 2
+            interval: 2000
+        sigma:
+            start: 1
+            end: 1
+            inc: 0.1
+            interval: 3000
+        order:
+            bool: False
+            interval: 10000
+    data_kwargs: {scale: null, flag_corr: True}
+    task_kwargs: {delta: 1, mu: 0, sigma: 0.1}
+
+out_dir: ../models/laplace_linear_regression
+
+wandb:
+    name: "noisy_laplace_linear_regression"
+

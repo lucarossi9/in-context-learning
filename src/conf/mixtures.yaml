@@ -1,0 +1,24 @@
+inherit: 
+    - models/TransformerMixtures.yaml
+    - wandb.yaml
+
+model:
+    n_dims: 5
+    n_positions: 501
+
+training:
+    batch_size: 32
+    learning_rate: 0.0001
+    save_every_steps: 20000
+    keep_every_steps: 100000
+    train_steps: 150001
+    data: mixtures
+    task: mixtures
+    data_kwargs: {}
+    task_kwargs: {}
+    n_clusters: 5
+    n_points: 1000
+out_dir: ../models/mixtures
+
+wandb:
+    name: "mixtures"

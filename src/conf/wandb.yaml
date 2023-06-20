@@ -1,0 +1,5 @@
+wandb:
+    project: in-context-learning-
+    entity: l-rossi
+    notes:
+    log_every_steps: 100

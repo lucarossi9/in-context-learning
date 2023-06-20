@@ -1,0 +1,6 @@
+model:
+    family: transformer_tensor_pca
+    n_head: 2
+    n_embd: 50
+    num_blocks: 10
+    initializer_range: 0.02

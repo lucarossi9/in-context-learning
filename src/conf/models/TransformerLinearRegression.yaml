@@ -1,0 +1,6 @@
+model:
+    family: transformer_linear_regression
+    n_head: 2
+    n_embd: 128
+    num_blocks: 10
+    initializer_range: 0.02

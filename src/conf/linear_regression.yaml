@@ -1,0 +1,40 @@
+inherit: 
+    - models/standard.yaml
+    - wandb.yaml
+
+model:
+    n_dims: 20
+    n_positions: 41
+
+training:
+    task: linear_regression
+    data: gaussian
+    batch_size: 64
+    learning_rate: 0.0001
+    save_every_steps: 20000
+    keep_every_steps: 100000
+    train_steps: 500001
+    curriculum:
+        dims:
+            start: 20
+            end: 20
+            inc: 0
+            interval: 100000
+        points:
+            start: 41
+            end: 41
+            inc: 0
+            interval: 10000
+        sigma:
+            start: 1
+            end: 1
+            inc: 0
+            interval: 1500
+    data_kwargs: {scale: null}
+    task_kwargs: {delta: 1, mu: 0}
+
+out_dir: ../models/linear_regression
+
+wandb:
+    name: "linear_regression_standard"
+
