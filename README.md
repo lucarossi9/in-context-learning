@@ -32,12 +32,25 @@ You can start by cloning our repository and following the steps below.
 3. [Optional] If you plan to train, populate `conf/wandb.yaml` with the information regarding your wandb account.
 
 ## Code structure
-That's it! You can now explore our pre-trained models or train your own. The key entry points
-are as follows (starting from `src`):
-- The `eval.ipynb` notebook contains code to load our own pre-trained models, plot the pre-computed metrics, and evaluate them on new data.
-- `train.py` takes as argument a configuration yaml from `conf` and trains the corresponding model. You can try `python train.py --config conf/toy.yaml` for a quick training run.
+* `src` - Folder containing the implementation.
+  * `conf` - Contains yaml files for model/task configuration.
+  * `base_models.py` - Contains some of the base models.
+  * `check_flops.py` - Allows to count the flops of a model.
+  * `curriculum.py` - Implements the curricula.
+  * `eval.py` -Implements the evaluation of trained models.
+  * `models.py` -Contains models.
+  * `plot_utils.py` - Plots functions.
+  * `results.ipynb` - Allows for loading models, reproducing plots and training new models.
+  * `samplers.py` - Allows for sampling the inputs.
+  * `tasks.py` - Allows for sampling the task.
+  * `train.py` - Allows for training Transformer for linear regression.
+  * `train_tensor_pca.py` - Allows for training Transformer for tensor_PCA.
+  * `train_mixtures.py` - Allows for training Transformer for mixtures of Bernoulli.
+  * `utilities_mixtures.py` - Contains utility function for mixture of Bernoulli problem.
+  * `utils.py` - Contains general utility functions.
+  * `requirements.txt` - Requirements file.
 
-
+To learn how to reproduce results or train new models follow the tutorial in `results.ipynb` notebook. If you want to change the configuration of our model, modify the corresponding files in the `conf` folder.
 
 ## Credits
 
