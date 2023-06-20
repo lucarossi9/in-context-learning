@@ -1,9 +1,18 @@
-This repository contains the code for the experiments of the "in-context learning regression" project.
+# In-context learning regression
 
+## Table of contents
+* [General info](#general-info)
+* [Setup](#setup)
+* [Credits](#credits)
 
+## General info
 ![](setting.jpg)
 
-## Getting started
+This repository contains the code for the "in-context learning regression" project.
+	
+## Setup
+To run this project, install it locally using npm:
+
 You can start by cloning our repository and following the steps below.
 
 1. Install the dependencies for our code using Conda. You may need to adjust the environment YAML file depending on your setup.
@@ -28,7 +37,8 @@ are as follows (starting from `src`):
 - `train.py` takes as argument a configuration yaml from `conf` and trains the corresponding model. You can try `python train.py --config conf/toy.yaml` for a quick training run.
 
 
-### Credits
+
+## Credits
 
 The repository is inspired by the codes of the paper
 *What Can Transformers Learn In-Context? A Case Study of Simple Function Classes** <br>
