@@ -243,7 +243,8 @@ if __name__ == "__main__":
     parser = QuinineArgumentParser(schema=schema)
     args = parser.parse_quinfig()
     assert args.model.family in ["gpt2", "lstm", "DNN", "DNNSimplified", "transformer_mixtures",
-                                 "transformer_tensor_PCA", "transformer_linear_regression"]
+                                 "transformer_tensor_PCA", "transformer_linear_regression",
+                                 "transformer_linear_regression_LSA"]
     print(f"Running with: {args}")
 
     if not args.test_run:

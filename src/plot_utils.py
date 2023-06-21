@@ -150,7 +150,7 @@ def plot_errors_layer_by_layer(results_path):
     for i in range(num_files):
         df = pd.read_csv(os.path.join(results_path, "run_" + str(i + 1) + ".csv"))
         # read results and compute statistics
-        df = df.iloc[-50:, 1]
+        df = df.iloc[-50:, 1]/20
         means.append(df.mean())
         percentiles_5.append(df.quantile(0.05))
         percentiles_95.append(df.quantile(0.95))

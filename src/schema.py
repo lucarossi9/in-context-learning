@@ -15,7 +15,8 @@ from funcy import merge
 
 model_schema = {
     "family": merge(tstring, allowed(["gpt2", "lstm", "DNN", "DNNSimplified", "transformer_mixtures",
-                                      "transformer_tensor_pca", "transformer_linear_regression"])),
+                                      "transformer_tensor_pca", "transformer_linear_regression",
+                                      "transformer_linear_regression_LSA"])),
     "n_positions": merge(tinteger, nullable, default(None)),  # maximum context length
     "n_dims": merge(tinteger, nullable, default(None)),  # latent dimension
     "n_embd": merge(tinteger, nullable, default(None)),  # embedding size

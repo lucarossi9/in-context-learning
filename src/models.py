@@ -76,6 +76,15 @@ def build_model(conf):
                                                    n_dims=conf.n_dims,
                                                    initializer_range=conf.initializer_range)
         model = TransformerLinearRegression(config)
+    elif conf.family == "transformer_linear_regression_LSA":
+        config = TransformerLinearRegressionLSAConfig(vocab_size=None,
+                                                   max_len=2 * conf.n_positions,
+                                                   num_heads=conf.n_head,
+                                                   num_blocks=conf.num_blocks,
+                                                   embed_dim=conf.n_embd,
+                                                   n_dims=conf.n_dims,
+                                                   initializer_range=conf.initializer_range)
+        model = TransformerLinearRegression_LSA(config)
     else:
         raise NotImplementedError
 
@@ -151,6 +160,7 @@ class TransformerModel(nn.Module):
     """
     Transformer model from GPT2 family
     """
+
     def __init__(self, n_dims, n_positions, n_embd=128, n_layer=12, n_head=4):
         """
         Init of the class
@@ -180,7 +190,7 @@ class TransformerModel(nn.Module):
         self.n_dims = n_dims
 
         # set linear transformation from the input matrix to the input of the first decoder block
-        self._read_in = nn.Linear(n_dims+1, n_embd)
+        self._read_in = nn.Linear(n_dims + 1, n_embd)
         self._backbone = GPT2Model(configuration)
 
         # linear transformation mapping the output of the structured Transformer to the predictions.
@@ -329,6 +339,7 @@ class LeastSquaresModel:
     """
     Implement the OLS estimator
     """
+
     def __init__(self, driver=None, **kwargs):
         """
         Init of the class.
@@ -404,6 +415,7 @@ class AveragingModel:
     """
     Compute the baseline Averaging.
     """
+
     def __init__(self):
         self.name = "averaging"
 
@@ -444,6 +456,7 @@ class LassoModel:
     """
     Class for the lasso model.
     """
+
     def __init__(self, alpha, max_iter=100000):
         """
         Init method for lasso model.
@@ -518,6 +531,7 @@ class GDModel:
     """
     Model implementing one step of GD for a NN
     """
+
     def __init__(
             self,
             model_class,  # to which model apply GD
@@ -646,6 +660,7 @@ class DecisionTreeModel:
     """
     Decision Tree model class
     """
+
     def __init__(self, max_depth=None):
         """
         Init method for the class.
@@ -699,6 +714,7 @@ class XGBoostModel:
     """
     Class XGBoost
     """
+
     def __init__(self):
         self.name = "xgboost"
 
@@ -747,6 +763,7 @@ class DeepNeuralNetwork(nn.Module):
     """
     The model implements the fully connected NN for in-context learning linear functions.
     """
+
     def __init__(self, n_dims, max_len_prompt, hidden_size=512, n_layers=8):
         """
         Init of the class
@@ -832,6 +849,7 @@ class DeepNeuralNetworkSimplified(nn.Module):
     """
     Implement the class of fully connected deep NN for a fixed length
     """
+
     def __init__(self, n_dims, max_len_prompt, hidden_size=512, n_layers=8):
         """
         Init of the class
@@ -902,6 +920,7 @@ class PosteriorMean:
     """
     The class implementing the posterior mean for Laplace prior
     """
+
     def __init__(self, delta, mu, sigma):
         """
         Init for the class.
@@ -984,6 +1003,7 @@ class AdaptiveLasso:
     """
     Class implementing AdaptiveLasso estimator.
     """
+
     def __init__(self, delta, mu, sigma, max_iter=100000):
         """
         Init method for the class
@@ -1062,6 +1082,7 @@ class Block(nn.Module):
     """
     Implement decoder block
     """
+
     def __init__(self, config):
         """
         Initialize decoder block
@@ -1095,6 +1116,7 @@ class MultiheadAttention(nn.Module):
     """
     The class implements the multihead self-attention layer.
     """
+
     def __init__(self, config):
         """
         Init for the class.
@@ -1155,6 +1177,7 @@ class BlockNoMask(nn.Module):
     """
     Decoder block when no masking is applied used for mixture problem.
     """
+
     def __init__(self, config):
         """
         Initialize decoder block
@@ -1179,7 +1202,7 @@ class BlockNoMask(nn.Module):
         :param x: inputs
         :return: predictions
         """
-        x = x + self.attn(self.ln1(x)) # attn layer
+        x = x + self.attn(self.ln1(x))  # attn layer
         x = x + self.ff(self.ln2(x))  # feed forward layer
         return x
 
@@ -1188,6 +1211,7 @@ class MultiheadAttentionNoMask(nn.Module):
     """
     Multi-Head self-attention layer with no masking.
     """
+
     def __init__(self, config):
         super().__init__()
         embed_dim = config.embed_dim
@@ -1251,6 +1275,7 @@ class TransformerTensorPCA(nn.Module):
     """
     Transformer used for tensor PCA
     """
+
     def __init__(self, config):
         """
         Init for the Transformer
@@ -1345,6 +1370,7 @@ class TransformerMixture(nn.Module):
     """
     Class of Transformers for mixtures
     """
+
     def __init__(self, config):
         """
         init of the Transformer
@@ -1411,12 +1437,12 @@ class TransformerMixture(nn.Module):
         output = self.ln(output)
         # compute the means as the last n_cluster colums of the output matrix of each batch after a linear transform
         means = self._read_out(output)[:, -n_clusters:, :]
-        means = self.sigmoid(means) # to normalize to be in [0,1]^d
+        means = self.sigmoid(means)  # to normalize to be in [0,1]^d
         means = means.transpose(1, 2)
 
         # compute the probas as the second to last n_clusters columns after a linear transformation.
         probas = self.proj_probs(output)[:, -2 * n_clusters:-n_clusters, -1]
-        probas = self.softmax(probas) #normalize so that they are positive and summing to 1
+        probas = self.softmax(probas)  # normalize so that they are positive and summing to 1
 
         return means, probas
 
@@ -1523,6 +1549,218 @@ class TransformerLinearRegression(nn.Module):
         zs = self._combine(xs, ys)
         zs = self.proj(zs)
         # position embedding
+        pos_embedding = self.pos_embed[:, :zs.shape[1], :]
+
+        output = self.blocks(zs + pos_embedding)
+        output = self.ln(output)
+        predictions = self._read_out(output)  # linear projection on R.
+
+        return predictions[:, ::2, 0]  # slice every two
+
+
+#################################################################################################
+class TransformerLinearRegressionLSAConfig:
+    """
+    Config class for a custom Transformer used for linear regression.
+    """
+    attn_dropout = 0.0
+    embed_dropout = 0.0
+    ff_dropout = 0.0
+
+    def __init__(self, vocab_size, max_len, num_heads, num_blocks, embed_dim, **kwargs):
+        """
+        Init method for the Transformer model.
+        :param vocab_size: size of the vocabulary.
+        :param max_len: max length of the prompt.
+        :param num_heads: number of heads in SA layer.
+        :param num_blocks: number of decoder blocks.
+        :param embed_dim: number of embedding dims.
+        :param kwargs: further params.
+        """
+        self.vocab_size = vocab_size
+        self.max_len = max_len
+        self.num_heads = num_heads
+        self.num_blocks = num_blocks
+        self.embed_dim = embed_dim
+        # additional arguments if we want to set them
+        for key, value in kwargs.items():
+            setattr(self, key, value)
+
+class Block_LSA(nn.Module):
+    """
+    Implement decoder block
+    """
+
+    def __init__(self, config):
+        """
+        Initialize decoder block
+        :param config: Configurations
+        """
+        super().__init__()
+        embed_dim = config.embed_dim
+        self.ln1 = nn.LayerNorm(embed_dim)
+        # self.ln2 = nn.LayerNorm(embed_dim)
+        self.attn = MultiheadAttention_LSA(config)
+        # self.ff = nn.Sequential(
+        #     nn.Linear(embed_dim, embed_dim * 4),
+        #     nn.GELU(),
+        #     nn.Linear(embed_dim * 4, embed_dim),
+        #     nn.Dropout(config.ff_dropout),
+        # )
+
+    def forward(self, x):
+        """
+        Forward for decoder block (self-attention+feed_forward)
+        :param x: inputs
+        :return: predictions
+        """
+        x = x + self.attn(self.ln1(x))
+        # x = x + self.ff(self.ln2(x))
+        # x = x + self.attn(self.ln1(x))
+        return x
+
+
+class MultiheadAttention_LSA(nn.Module):
+    """
+    The class implements the multihead self-attention layer.
+    """
+
+    def __init__(self, config):
+        """
+        Init for the class.
+        :param config: the configurations.
+        """
+        super().__init__()
+        embed_dim = config.embed_dim
+        self.num_heads = config.num_heads
+        assert embed_dim % self.num_heads == 0, "invalid heads and embedding dimension configuration"
+
+        # key components of SA layer
+        self.key = nn.Linear(embed_dim, embed_dim, bias=False)
+        self.value = nn.Linear(embed_dim, embed_dim, bias=False)
+        self.query = nn.Linear(embed_dim, embed_dim, bias=False)
+        self.proj = nn.Linear(embed_dim, embed_dim, bias=False)
+        self.attn_dropout = nn.Dropout(config.attn_dropout)
+        self.proj_dropout = nn.Dropout(config.ff_dropout)
+        self.register_buffer(
+            "mask",
+            torch.tril(torch.ones(config.max_len, config.max_len)).unsqueeze(0).unsqueeze(0)
+        )
+
+    def forward(self, zs):
+        """
+        Forward for multi-head self attention layer
+        :param zs:
+        :return:
+        """
+        batch_size = zs.size(0)
+        seq_len = zs.size(1)
+        # x.shape == (batch_size, seq_len, embed_dim)
+        k_t = self.key(zs).reshape(batch_size, seq_len, self.num_heads, -1).permute(0, 2, 3, 1)
+        v = self.value(zs).reshape(batch_size, seq_len, self.num_heads, -1).transpose(1, 2)
+        q = self.query(zs).reshape(batch_size, seq_len, self.num_heads, -1).transpose(1, 2)
+        # shape == (batch_size, num_heads, seq_len, head_dim)
+
+        # compute attention
+        attn = torch.matmul(q, k_t) / math.sqrt(q.size(-1))
+        # attn.shape == (batch_size, num_heads, seq_len, seq_len)
+        # apply masking
+        mask = self.mask[:, :, :seq_len, :seq_len]
+        attn = attn.masked_fill(mask == 0, float(0))
+        attn = self.attn_dropout(attn)
+        # attn.shape == (batch_size, num_heads, seq_len, seq_len)
+        # compute score
+        # attn = F.softmax(attn, dim=-1)
+        y = torch.matmul(attn, v)
+        # y.shape == (batch_size, num_heads, seq_len, head_dim)
+        y = y.transpose(1, 2)
+        # y.shape == (batch_size, seq_len, num_heads, head_dim)
+        y = y.reshape(batch_size, seq_len, -1)
+        # y.shape == (batch_size, seq_len, embed_dim)
+        y = self.proj_dropout(self.proj(y))
+        return y
+
+
+class TransformerLinearRegression_LSA(nn.Module):
+
+    def __init__(self, config):
+        """
+        init of the Transformer
+        :param config: configurations.
+        """
+        super().__init__()
+        self.embed_dim = config.embed_dim
+        self.n_dims = config.n_dims
+        self.max_len = config.max_len
+        self.initializer_range = config.initializer_range
+        self.name = f"transformer_linear_regression_LSA_n_layers={config.num_blocks}"
+
+        # self.tok_embed = nn.Embedding(config.vocab_size, embed_dim)
+        # self.pos_embed = nn.Embedding(config.max_len, embed_dim)
+        self.proj = nn.Linear(self.n_dims+1, self.embed_dim)
+        self.pos_embed = nn.Parameter(
+            torch.zeros(1, config.max_len, self.embed_dim)
+        )
+        self.blocks = nn.Sequential(
+            *[Block_LSA(config) for _ in range(config.num_blocks)]
+        )
+        self.ln = nn.LayerNorm(self.embed_dim)
+        self._read_out = nn.Linear(self.embed_dim, 1)
+
+    def initialize_weights(self, m):
+        """
+        Initialize the weights of the Transformers
+        :param m: model
+        :return: None
+        """
+        if isinstance(m, nn.Linear):
+            m.weight.data.normal_(mean=0.0, std=self.initializer_range)
+            if m.bias is not None:
+                m.bias.data.zero_()
+        elif isinstance(m, nn.Embedding):
+            m.weight.data.normal_(mean=0.0, std=self.initializer_range)
+            if m.bias is not None:
+                m.bias.data.zero_()
+
+    @staticmethod  # method that does not use any method of the class but it makes sense to add it to the class
+    def _combine(xs_b, ys_b):
+        """
+        Interleaves xs and ys into a single input matrix for each batch.
+        :param xs_b: Batch of xs.
+        :param ys_b: Batch of ys.
+        :return: the combine tensor (xs_b, ys_b)
+        """
+        bsize, points, dim = xs_b.shape  # bsize = batch_size, points = length of the prompt, dim = dimension of each x
+
+        xs_b_wide = torch.cat(
+            (
+                xs_b,
+                torch.zeros(bsize, points, 1, device=ys_b.device)
+            ),
+            axis=2,
+        )
+        ys_b_wide = torch.cat(
+            (
+                xs_b,
+                ys_b.view(bsize, points, 1),  # reshape ys_b as a tensor (bsize, points, 1)
+            ),
+            axis=2,
+        )
+        zs = torch.stack((xs_b_wide, ys_b_wide), dim=2)
+        zs = zs.view(bsize, 2 * points, dim + 1)
+
+        return zs
+
+    def forward(self, xs, ys):
+        """
+        Forward method for custom Transformer model
+        :param xs: Batch of xs.
+        :param ys: Batch of ys.
+        :return: the predictions.
+        """
+        zs = self._combine(xs, ys)
+        zs = self.proj(zs)
+        # position embeddign
         pos_embedding = self.pos_embed[:, :zs.shape[1], :]
 
         output = self.blocks(zs + pos_embedding)

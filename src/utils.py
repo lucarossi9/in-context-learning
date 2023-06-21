@@ -1,7 +1,9 @@
 import torch
 import torch.nn as nn
 from models import Block
+from models import Block_LSA
 from models import TransformerLinearRegressionConfig
+from models import TransformerLinearRegressionLSAConfig
 from eval import get_model_from_run
 from train import train
 import wandb
@@ -78,7 +80,7 @@ def create_submodel(model, depth, n_embd, n):
     return SubModel()
 
 
-def test_errors_layer_by_layer(run_path):
+def test_errors_layer_by_layer(run_path, LSA=False):
     """
     Given a run path it computes the errors of the probe models.
     :param run_path: path of the run of the original model
@@ -91,7 +93,10 @@ def test_errors_layer_by_layer(run_path):
     submodels = []
     # creates all the submodels
     for depth in range(1, n + 1):
-        submodel = create_submodel(model, depth, n_embd, n)
+        if LSA==False:
+          submodel = create_submodel(model, depth, n_embd, n)
+        else:
+          submodel = create_submodel_LSA(model, depth, n_embd, n)
 
         state_dict_model = model.state_dict()
         state_dict_submodel = submodel.state_dict()
@@ -182,8 +187,8 @@ def plot_SPD_laplace(folder, n_files):
     fig, ax = plt.subplots(1, 1)
 
     color = 0
-    metrics = {"OLS": similarity_with_OLS, "Lasso (alpha=0.1)": similarity_with_lasso_01,
-              "Posterior mean": similarity_with_posterior_mean, "Adaptive Lasso": similarity_with_lasso_adaptive}
+    metrics = {"OLS-ICL": similarity_with_OLS, "Lasso (alpha=0.1)-ICL": similarity_with_lasso_01,
+              "Posterior mean-ICL": similarity_with_posterior_mean, "Adaptive Lasso-ICL": similarity_with_lasso_adaptive}
     for name, metric in metrics.items():
         ax.plot(metric, "-", label=name, color=palette[color % 10], lw=2)
         color += 1
@@ -196,3 +201,103 @@ def plot_SPD_laplace(folder, n_files):
 
     # Displaying the plot
     plt.show()
+
+def create_submodel_LSA(model, depth, n_embd, n):
+    """
+    From a single Transformer model, it creates multiple probe submodels
+    :param model: original model.
+    :param depth: depth of the sub model.
+    :param n_embd: embedding dimension.
+    :param n: depth original model
+    :return: the submodel
+    """
+    config = TransformerLinearRegressionLSAConfig(None, model.max_len, 1, n, model.embed_dim)
+
+    class SubModel(nn.Module):
+        def __init__(self):
+            """
+            init of the Transformer
+            :param config: configurations.
+            """
+            super().__init__()
+            self.embed_dim = config.embed_dim
+            self.n_dims = model.n_dims
+            self.max_len = model.max_len
+            self.initializer_range = model.initializer_range
+            self.name = f"transformer_linear_regression_LSA_n_layers={config.num_blocks}"
+
+            # self.tok_embed = nn.Embedding(config.vocab_size, embed_dim)
+            # self.pos_embed = nn.Embedding(config.max_len, embed_dim)
+            self.proj = nn.Linear(self.n_dims+1, self.embed_dim)
+            self.pos_embed = nn.Parameter(
+                torch.zeros(1, config.max_len, self.embed_dim)
+            )
+            self.blocks = nn.Sequential(
+                *[Block_LSA(config) for _ in range(config.num_blocks)]
+            )
+            self.ln = nn.LayerNorm(self.embed_dim)
+            self._read_out = nn.Linear(self.embed_dim, 1)
+
+        def initialize_weights(self, m):
+            """
+            Initialize the weights of the Transformers
+            :param m: model
+            :return: None
+            """
+            if isinstance(m, nn.Linear):
+                m.weight.data.normal_(mean=0.0, std=self.initializer_range)
+                if m.bias is not None:
+                    m.bias.data.zero_()
+            elif isinstance(m, nn.Embedding):
+                m.weight.data.normal_(mean=0.0, std=self.initializer_range)
+                if m.bias is not None:
+                    m.bias.data.zero_()
+
+        @staticmethod  # method that does not use any method of the class but it makes sense to add it to the class
+        def _combine(xs_b, ys_b):
+            """
+            Interleaves xs and ys into a single input matrix for each batch.
+            :param xs_b: Batch of xs.
+            :param ys_b: Batch of ys.
+            :return: the combine tensor (xs_b, ys_b)
+            """
+            bsize, points, dim = xs_b.shape  # bsize = batch_size, points = length of the prompt, dim = dimension of each x
+
+            xs_b_wide = torch.cat(
+                (
+                    xs_b,
+                    torch.zeros(bsize, points, 1, device=ys_b.device)
+                ),
+                axis=2,
+            )
+            ys_b_wide = torch.cat(
+                (
+                    xs_b,
+                    ys_b.view(bsize, points, 1),  # reshape ys_b as a tensor (bsize, points, 1)
+                ),
+                axis=2,
+            )
+            zs = torch.stack((xs_b_wide, ys_b_wide), dim=2)
+            zs = zs.view(bsize, 2 * points, dim + 1)
+
+            return zs
+
+        def forward(self, xs, ys):
+            """
+            Forward method for custom Transformer model
+            :param xs: Batch of xs.
+            :param ys: Batch of ys.
+            :return: the predictions.
+            """
+            zs = self._combine(xs, ys)
+            zs = self.proj(zs)
+            # position embedding
+            pos_embedding = self.pos_embed[:, :zs.shape[1], :]
+
+            output = self.blocks(zs + pos_embedding)
+            output = self.ln(output)
+            predictions = self._read_out(output)  # linear projection on R.
+
+            return predictions[:, ::2, 0]  # slice every two
+
+    return SubModel()

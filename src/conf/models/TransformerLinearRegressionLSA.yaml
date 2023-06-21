@@ -1,5 +1,5 @@
 model:
-    family: transformer_linear_regression
+    family: transformer_linear_regression_LSA
     n_head: 1
     n_embd: 128
     num_blocks: 10
