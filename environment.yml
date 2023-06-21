@@ -7,15 +7,20 @@ dependencies:
   - python=3.8.12
   - pytorch=1.11.0
   - pip:
-    - jupyter==1.0.0
-    - matplotlib==3.5.2
-    - numpy==1.22.3
-    - pandas==1.4.2
+    - arviz==0.15.1
+    - funcy==1.15
+    - fvcore==0.1.5.post20221221
+    - matplotlib==3.7.1
+    - munch==2.5.0
+    - numpy==1.22.4
+    - pandas==1.5.3
+    - pymc==5.1.2
+    - PyYAML==5.4
     - quinine==0.3.0
-    - scikit-learn==1.0.2
-    - seaborn==0.11.2
-    - tqdm==4.64.0
-    - transformers==4.17.0
-    - wandb==0.12.11
-    - xgboost==1.6.1
-    - protobuf==3.20.1
+    - scikit_learn==1.2.2
+    - seaborn==0.12.2
+    -  torch==2.0.1+cu118
+    - tqdm==4.65.0
+    - transformers==4.30.2
+    - wandb==0.15.4
+    - xgboost==1.7.5
